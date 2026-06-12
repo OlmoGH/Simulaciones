@@ -179,22 +179,22 @@ def calcular_lyapunov_automatico(tiempo, dist, epsilon=1e-8, d_sat=0.1):
 def sacar_imagen():
     # Listas para guardar los resultados de la transición
     n_medias = 20
-    n_sigma = 100
-    n_C = 100
+    n_sigma = 50
+    n_C = 50
     valores_sigma = np.linspace(0, 2, n_sigma)
     valores_conectividad = np.linspace(0, 1, n_C)
     lyapunov_exponents = np.zeros((n_sigma, n_C))
 
     for i, s in enumerate(valores_sigma):
         for j, C in enumerate(valores_conectividad):
-            media = 0
+            list_lambdas = np.zeros(n_medias)
             if ((i * n_sigma + j) * 10) % (n_sigma * n_C) == 0:
                 print("Paso ", (i * n_sigma + j), " de ", n_sigma * n_C)
 
             for muestra in range(n_medias):
 
                 # 1. Construyes la matriz con el sigma actual
-                N = 1000
+                N = 100
 
                 tau = 1
 
@@ -226,11 +226,9 @@ def sacar_imagen():
                 
                 # 5. LLAMADA AUTOMÁTICA
                 lambda_mle = calcular_lyapunov_automatico(time, dist)
-                media += lambda_mle
+                list_lambdas[muestra] =  lambda_mle
 
-            media = media/n_medias
-
-            lyapunov_exponents[i, j] = media
+            lyapunov_exponents[i, j] = np.nanmean(list_lambdas)
 
     return lyapunov_exponents
 
@@ -242,12 +240,12 @@ lyapunov_exponents = sacar_imagen()
 print("Después de la función")
 # --- GRAFICAR LA TRANSICIÓN DE FASE DE LYAPUNOV ---
 plt.figure()
-img = plt.imshow(lyapunov_exponents.T, cmap='RdBu_r', extent=[0, 1, 2, 0], vmin=-1, vmax=1, aspect='auto')
+img = plt.imshow(lyapunov_exponents.T, cmap='RdBu_r', origin='lower', extent=[0, 1, 0, 2], vmin=-1, vmax=1, aspect='auto')
 plt.colorbar(img)
 plt.ylabel(r"$\sigma$")
 plt.xlabel(r"$C$")
-plt.title("Transición de fase al Caos Dinámico")
+plt.title("Largest Lyapunov exponent")
 plt.tight_layout()
-plt.savefig("Transición de fase.png")
-plt.savefig("Transición de fase.pdf")
+plt.savefig("Transición de fase sin nan.png")
+plt.savefig("Transición de fase sin nan.pdf")
 plt.show()
