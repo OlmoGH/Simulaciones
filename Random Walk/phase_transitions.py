@@ -178,9 +178,9 @@ def calcular_lyapunov_automatico(tiempo, dist, epsilon=1e-8, d_sat=0.1):
 @njit(fastmath=True)
 def sacar_imagen():
     # Listas para guardar los resultados de la transición
-    n_medias = 20
-    n_sigma = 100
-    n_C = 100
+    n_medias = 1
+    n_sigma = 10
+    n_C = 10
     valores_sigma = np.linspace(0, 2, n_sigma)
     valores_conectividad = np.linspace(0, 1, n_C)
     lyapunov_exponents = np.zeros((n_sigma, n_C))
@@ -235,19 +235,45 @@ def sacar_imagen():
     return lyapunov_exponents
 
 
-regresion_lineal_numba(np.ones(2), np.ones(2))
+# # regresion_lineal_numba(np.ones(2), np.ones(2))
 
-print("Antes de la función")
-lyapunov_exponents = sacar_imagen()
-print("Después de la función")
-# --- GRAFICAR LA TRANSICIÓN DE FASE DE LYAPUNOV ---
-plt.figure()
-img = plt.imshow(lyapunov_exponents.T, cmap='RdBu_r', extent=[0, 1, 2, 0], vmin=-1, vmax=1, aspect='auto')
-plt.colorbar(img)
-plt.ylabel(r"$\sigma$")
-plt.xlabel(r"$C$")
-plt.title("Transición de fase al Caos Dinámico")
+# print("Antes de la función")
+# # lyapunov_exponents = sacar_imagen()
+# print("Después de la función")
+# # --- GRAFICAR LA TRANSICIÓN DE FASE DE LYAPUNOV ---
+# plt.figure()
+# img = plt.imshow(lyapunov_exponents.T, cmap='RdBu_r', extent=[0, 1, 2, 0], vmin=-1, vmax=1, aspect='auto')
+# plt.colorbar(img)
+# plt.ylabel(r"$\sigma$")
+# plt.xlabel(r"$C$")
+# plt.title("Transición de fase al Caos Dinámico")
+# plt.tight_layout()
+# plt.savefig("Transición de fase.png")
+# plt.savefig("Transición de fase.pdf")
+# plt.show()
+
+N = 100
+C = 1
+s = 2
+
+tau = 1
+
+dt = 0.01
+steps = int(30/dt)
+time = np.linspace(0, steps * dt, steps)
+epsilon = 1e-8
+
+A , K = construir_matriz_ISLM(N, C, s, 0, 1)
+
+
+X_0 = np.ones(N)
+
+X = deterministic_interacting_time_series(X_0, tau, dt, A, steps)
+
+plt.plot(time, X, c='red', alpha=0.6)
+plt.xlabel("Time", fontsize=18)
+plt.ylabel("Abundance", fontsize=18)
+plt.title(fr"$\sigma = {s}$  $C = {C}$", fontsize=18)
+plt.tick_params(axis='both', labelsize=14)
 plt.tight_layout()
-plt.savefig("Transición de fase.png")
-plt.savefig("Transición de fase.pdf")
 plt.show()
