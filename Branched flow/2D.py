@@ -51,7 +51,7 @@ interp_dn_dy = RegularGridInterpolator((x, y), dn_dy, method='linear', bounds_er
 pos_0 = np.zeros((nrays, 2))
 pos_0[:, 0] = 0.0
 # Se distribuyen uniformemente entre y=0.495 y y=0.500
-pos_0[:, 1] = np.linspace(0.4999, 0.5, nrays)
+pos_0[:, 1] = np.linspace(0.499, 0.5, nrays)
 
 p_0 = np.zeros((nrays, 2))
 n_iniciales = n(pos_0) # Una sola llamada al interpolador
